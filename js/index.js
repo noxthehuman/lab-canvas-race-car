@@ -42,18 +42,38 @@ const car = {
 
   move(direction) {
     if(direction === 'left') {
-      this.x -= 5;
+      this.x -= 20;
     }
     if(direction === 'right') {
-      this.x += 5;
+      this.x += 20;
     }
     refreshDrawings();
+  }
+}
+
+const obstacles = []
+
+class Obstacle {
+  constructor() {
+    this.y = 0
+    this.height = 30
+    this.x = Math.random() * canvas.width
+    this.width = Math.random() * canvas.width * 0.6
+  }
+  draw() {
+    context.fillStyle = 'brown'
+    context.fillRect(this.x, this.y, this.width, this.height)
+  }
+
+  move(distance) {
+    this.y += distance
   }
 }
 
 function refreshDrawings() {
   clearCanvas()
   road.draw()
+  obstacles.forEach((obstacle) => obstacle.draw())
   car.draw()
 }
 
@@ -71,12 +91,29 @@ car.image.src = './images/car.png';
     }
   }
 
+  let iterationCount = 0;
+
+  function manageObstacles() {
+    obstacles.forEach((obstacles) => {
+      obstacles.move(5)
+    })
+    iterationCount++
+
+    if(iterationCount % 50 === 0) {
+      if (Math.random() < 0.8) {
+        obstacles.push(new Obstacle())
+      }
+     }
+    refreshDrawings()
+  }
+
   function startGame() {
     canvas.width = road.image.width * 2;
     canvas.height = road.image.height * 2;
-    road.draw();
-    car.draw();
 
-    document.addEventListener('keydown', handleKeyDown)
+    setInterval(manageObstacles, 25)
+
+    refreshDrawings()
+    document.addEventListener('keydown', handleKeyDown);
   }
 };
